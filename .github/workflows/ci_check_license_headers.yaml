@@ -22,10 +22,12 @@ name: Run Apache RAT check
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+  push:
+  workflow_dispatch:
 
 jobs:
   apache-rat-check:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout code
@@ -48,3 +50,10 @@ jobs:
             echo "✅ Apache RAT check PASSED - All files have approved licenses."
           fi
 
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+      fail-fast: false
