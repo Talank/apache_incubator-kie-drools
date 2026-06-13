@@ -29,6 +29,10 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
+      - name: Enable long paths for Git (Windows)
+        if: runner.os == 'Windows'
+        run: git config --global core.longpaths true
+
       - name: Checkout code
         uses: actions/checkout@v6
 
@@ -42,10 +46,17 @@ jobs:
         run: mvn package -Dquickly
 
       - name: Make script executable
+        if: runner.os != 'Windows'
         run: chmod +x ./check-split-packages.sh
 
       - name: Run split package detection
+        if: runner.os != 'Windows'
         run: ./check-split-packages.sh
+
+      - name: Run split package detection (Windows)
+        if: runner.os == 'Windows'
+        run: bash ./check-split-packages.sh
+        shell: bash
 
       - name: Upload results as artifact if failure
         if: always()
