@@ -29,6 +29,11 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
+      - name: Enable long paths (Windows)
+        if: runner.os == 'Windows'
+        run: git config --system core.longpaths true
+        continue-on-error: true
+
       - name: Checkout code
         uses: actions/checkout@v6
 
@@ -42,6 +47,7 @@ jobs:
         run: mvn package -Dquickly
 
       - name: Make script executable
+        if: runner.os != 'Windows'
         run: chmod +x ./check-split-packages.sh
 
       - name: Run split package detection
