@@ -22,16 +22,11 @@
 name: Split Package Detection
 
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-  # Optional: Run manually from the Actions tab
   workflow_dispatch:
 
 jobs:
   check-split-packages:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout code
@@ -53,10 +48,16 @@ jobs:
         run: ./check-split-packages.sh
 
       - name: Upload results as artifact if failure
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: split-package-report
           path: |
             check-split-packages.sh
             # You could save the output to a file and include that too
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - ubuntu-24.04-arm
+      fail-fast: false
